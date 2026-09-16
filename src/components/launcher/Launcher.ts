@@ -6,6 +6,8 @@ export interface LauncherOptions {
   /** Hover/focus tooltip text. Hidden on narrow viewports (a tap can't "hover"). */
   tooltip: string
   mascot: ClipMascot
+  /** Whether to render the decorative accent ring behind the mascot. Defaults to true. */
+  showRing?: boolean
   onToggle: () => void
 }
 
@@ -33,17 +35,22 @@ export class Launcher {
     this.element.setAttribute('aria-label', options.label)
     this.element.setAttribute('aria-describedby', tooltipId)
 
-    const ring = document.createElement('span')
-    ring.className = 'clip-launcher__ring'
-    ring.setAttribute('aria-hidden', 'true')
-
     const tooltip = document.createElement('span')
     tooltip.className = 'clip-launcher__tooltip'
     tooltip.id = tooltipId
     tooltip.setAttribute('role', 'tooltip')
     tooltip.textContent = options.tooltip
 
-    this.element.append(tooltip, ring, this.mascot.element)
+    this.element.append(tooltip)
+
+    if (options.showRing ?? true) {
+      const ring = document.createElement('span')
+      ring.className = 'clip-launcher__ring'
+      ring.setAttribute('aria-hidden', 'true')
+      this.element.append(ring)
+    }
+
+    this.element.append(this.mascot.element)
 
     this.element.addEventListener('click', options.onToggle)
     this.element.addEventListener('pointerenter', () => this.setHovering(true))

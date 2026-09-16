@@ -1,7 +1,15 @@
 import { ClipAssistant } from './core/ClipAssistant'
-import type { ClipPosition, ClipTheme } from './core/types'
+import type { ClipMascotPreset, ClipPosition, ClipTheme } from './core/types'
 
-const OBSERVED_ATTRIBUTES = ['endpoint', 'title', 'position', 'greeting', 'theme', 'suggestions'] as const
+const OBSERVED_ATTRIBUTES = [
+  'endpoint',
+  'title',
+  'position',
+  'greeting',
+  'theme',
+  'mascot',
+  'suggestions',
+] as const
 
 /**
  * `<clip-assistant>` custom element wrapping ClipAssistant for markup-only usage.
@@ -29,6 +37,7 @@ export class ClipAssistantElement extends HTMLElement {
       position: (this.getAttribute('position') as ClipPosition | null) ?? undefined,
       greeting: this.getAttribute('greeting') ?? undefined,
       theme: (this.getAttribute('theme') as ClipTheme | null) ?? undefined,
+      mascot: (this.getAttribute('mascot') as ClipMascotPreset | null) ?? undefined,
       suggestions: suggestionsAttr
         ? suggestionsAttr
             .split('|')

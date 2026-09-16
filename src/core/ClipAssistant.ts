@@ -42,15 +42,25 @@ export class ClipAssistant {
       this.config.transport ??
       new HttpTransport({ endpoint: this.config.endpoint as string, headers: this.config.headers })
 
-    this.launcherMascot = new ClipMascot({ assets: this.config.mascotAssets, size: 70 })
+    this.launcherMascot = new ClipMascot({
+      preset: this.config.mascot,
+      assets: this.config.mascotAssets,
+      size: 70,
+    })
     this.launcher = new Launcher({
       label: this.config.title,
       tooltip: this.config.title,
       mascot: this.launcherMascot,
+      // The gold accent ring was designed around Clip's silhouette; other presets sit on their own.
+      showRing: this.config.mascot === 'clip',
       onToggle: () => this.toggle(),
     })
 
-    this.headerMascot = new ClipMascot({ assets: this.config.mascotAssets, size: 44 })
+    this.headerMascot = new ClipMascot({
+      preset: this.config.mascot,
+      assets: this.config.mascotAssets,
+      size: 44,
+    })
     this.headerMascot.setState('open')
 
     this.messageList = new MessageList()

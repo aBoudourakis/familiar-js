@@ -6,6 +6,9 @@ export type ClipPosition = 'bottom-right' | 'bottom-left'
 /** Theming mode. `auto` follows `prefers-color-scheme`. */
 export type ClipTheme = 'light' | 'dark' | 'auto'
 
+/** Built-in mascot artwork to use. See `src/mascot/presets.ts` for the asset sets. */
+export type ClipMascotPreset = 'clip' | 'lens' | 'seeer' | 'wizard'
+
 /** A single turn in the conversation, sent to and rendered from the backend. */
 export interface ConversationMessage {
   role: 'user' | 'assistant'
@@ -78,7 +81,9 @@ export interface ClipAssistantConfig {
   suggestions?: string[]
   /** Theming mode. */
   theme?: ClipTheme
-  /** Replaceable mascot artwork. */
+  /** Built-in mascot artwork to use. Defaults to `'clip'`. */
+  mascot?: ClipMascotPreset
+  /** Per-state artwork overrides, merged on top of `mascot`. Use this to fully replace the mascot with your own art. */
   mascotAssets?: ClipMascotAssets
   /** Whether to send prior turns as `conversation` context. Defaults to true. */
   sendHistory?: boolean

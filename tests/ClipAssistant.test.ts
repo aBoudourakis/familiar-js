@@ -148,6 +148,25 @@ describe('ClipAssistant', () => {
     expect(document.querySelector('.clip-panel__intro')?.textContent).toBe('Hello there.')
   })
 
+  it('uses the "lens" mascot preset for the launcher and panel header when configured', () => {
+    new ClipAssistant({ transport, mascot: 'lens' })
+
+    const launcherImg = document.querySelector('.clip-launcher .clip-mascot__image') as HTMLImageElement
+    expect(launcherImg.src).toContain('/mascot/Lens/idle.webp')
+
+    const headerImg = document.querySelector('.clip-panel__header .clip-mascot__image') as HTMLImageElement
+    expect(headerImg.src).toContain('/mascot/Lens/focused.webp')
+  })
+
+  it('only shows the decorative accent ring for the "clip" mascot preset', () => {
+    new ClipAssistant({ transport, mascot: 'clip' })
+    expect(document.querySelector('.clip-launcher__ring')).toBeTruthy()
+    document.body.innerHTML = ''
+
+    new ClipAssistant({ transport, mascot: 'lens' })
+    expect(document.querySelector('.clip-launcher__ring')).toBeNull()
+  })
+
   it('destroy() removes the widget from the DOM', () => {
     const assistant = new ClipAssistant({ transport })
     expect(document.querySelector('.clip-assistant')).toBeTruthy()

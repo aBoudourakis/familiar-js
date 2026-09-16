@@ -13,6 +13,7 @@ const DEFAULTS: Omit<
   greeting: DEFAULT_GREETING,
   suggestions: [],
   theme: 'auto',
+  mascot: 'clip',
   sendHistory: true,
   historyLimit: DEFAULT_HISTORY_LIMIT,
   openOnLoad: false,

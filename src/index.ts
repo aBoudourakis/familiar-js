@@ -8,6 +8,7 @@ export {
   type AssistantResponse,
   type ClipAssistantConfig,
   type ClipMascotAssets,
+  type ClipMascotPreset,
   type ClipPosition,
   type ClipSource,
   type ClipTheme,

@@ -1,37 +1,25 @@
-import clipEyesClosed from '../assets/mascot/Clip/Clip_eyes_closed.webp'
-import clipEyesClosing from '../assets/mascot/Clip/Clip_eyes_closing.webp'
-import clipFocused from '../assets/mascot/Clip/Clip_focused.webp'
-import clipHover from '../assets/mascot/Clip/Clip_hover.webp'
-import clipIdle from '../assets/mascot/Clip/Clip_idle.webp'
-import clipThinking from '../assets/mascot/Clip/Clip_thinking.webp'
-import type { ClipMascotAssets } from '../core/types'
+import type { ClipMascotAssets, ClipMascotPreset } from '../core/types'
+import { DEFAULT_MASCOT_PRESET, MASCOT_PRESETS } from './presets'
 import { IDLE_BLINK_SEQUENCE, type BlinkPhase, type ClipMascotState } from './states'
 
 export interface ClipMascotOptions {
-  /** Replaceable artwork per state. Falls back to the built-in Clip illustrations. */
+  /** Built-in mascot artwork to use as the base. Defaults to `'clip'`. */
+  preset?: ClipMascotPreset
+  /** Per-state artwork overrides, merged on top of `preset`. */
   assets?: ClipMascotAssets
+  /** Height/width ratio of the artwork. Defaults to the selected preset's own ratio. */
+  aspectRatio?: number
   /** Rendered width in px; height follows the source art's aspect ratio. Defaults to 56. */
   size?: number
 }
 
-const DEFAULT_ASSETS: Required<ClipMascotAssets> = {
-  idle: clipIdle,
-  hover: clipHover,
-  thinking: clipThinking,
-  open: clipFocused,
-  eyesClosing: clipEyesClosing,
-  eyesClosed: clipEyesClosed,
-}
-
-/** Matches the source illustrations' native aspect ratio (1129x1393). */
-const ASPECT_RATIO = 1393 / 1129
-
 /**
- * Renders and animates the Clip mascot — an original paperclip-inspired
- * illustration (see src/assets/design-sources/Clip) rather than a generic
- * chatbot icon. Idle cycles through a slow, deliberate blink; every other
- * state holds a single static frame. Every frame is replaceable via `assets`
- * so consumers can swap in their own mascot/branding.
+ * Renders and animates the mascot — an illustrated character (see
+ * src/assets/design-sources) rather than a generic chatbot icon. Idle
+ * cycles through a slow, deliberate blink; every other state holds a single
+ * static frame. Ships with two built-in presets ("clip", "lens"); every
+ * frame is also replaceable via `assets` so consumers can swap in their own
+ * mascot/branding entirely.
  */
 export class ClipMascot {
   readonly element: HTMLElement
@@ -45,7 +33,8 @@ export class ClipMascot {
   private readonly prefersReducedMotion: boolean
 
   constructor(options: ClipMascotOptions = {}) {
-    this.assets = { ...DEFAULT_ASSETS, ...options.assets }
+    const preset = MASCOT_PRESETS[options.preset ?? DEFAULT_MASCOT_PRESET]
+    this.assets = { ...preset.assets, ...options.assets }
     this.prefersReducedMotion =
       typeof window !== 'undefined' &&
       typeof window.matchMedia === 'function' &&
@@ -55,7 +44,7 @@ export class ClipMascot {
     this.element.className = 'clip-mascot'
     this.element.setAttribute('data-state', this.state)
     this.element.setAttribute('aria-hidden', 'true')
-    this.element.style.setProperty('--clip-mascot-aspect', String(ASPECT_RATIO))
+    this.element.style.setProperty('--clip-mascot-aspect', String(options.aspectRatio ?? preset.aspectRatio))
     if (options.size) {
       this.element.style.setProperty('--clip-mascot-size', `${options.size}px`)
     }

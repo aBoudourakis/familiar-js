@@ -1,14 +1,23 @@
-import { ClipAssistant, type ClipPosition, type ClipTheme } from '../src'
+import { ClipAssistant, type ClipMascotPreset, type ClipPosition, type ClipTheme } from '../src'
 import { MockTransport } from './mockTransport'
 
 const params = new URLSearchParams(location.search)
 const initialPosition = (params.get('position') as ClipPosition | null) ?? 'bottom-right'
+const initialMascot = (params.get('mascot') as ClipMascotPreset | null) ?? 'clip'
+const MASCOT_LABELS: Record<ClipMascotPreset, string> = {
+  clip: 'Clip',
+  lens: 'Lens',
+  seeer: 'Seeer',
+  wizard: 'Wizard',
+}
+const mascotLabel = MASCOT_LABELS[initialMascot] ?? MASCOT_LABELS.clip
 
 const assistant = new ClipAssistant({
   transport: new MockTransport(),
   position: initialPosition,
-  title: 'Ask Clip',
-  subtitle: 'Clip · Demo Assistant',
+  mascot: initialMascot,
+  title: `Ask ${mascotLabel}`,
+  subtitle: `${mascotLabel} · Demo Assistant`,
   greeting: 'Hi! I can answer questions about this demo and how clip-js works.',
   disclosure: 'This demo runs entirely in your browser — no real backend is called.',
   suggestions: [
@@ -21,14 +30,22 @@ const assistant = new ClipAssistant({
 })
 
 const positionSelect = document.querySelector<HTMLSelectElement>('#position-select')
+const mascotSelect = document.querySelector<HTMLSelectElement>('#mascot-select')
 const themeSelect = document.querySelector<HTMLSelectElement>('#theme-select')
 const openButton = document.querySelector<HTMLButtonElement>('#open-button')
 
 if (positionSelect) positionSelect.value = initialPosition
+if (mascotSelect) mascotSelect.value = initialMascot
 
 positionSelect?.addEventListener('change', () => {
   const url = new URL(location.href)
   url.searchParams.set('position', positionSelect.value)
+  location.href = url.toString()
+})
+
+mascotSelect?.addEventListener('change', () => {
+  const url = new URL(location.href)
+  url.searchParams.set('mascot', mascotSelect.value)
   location.href = url.toString()
 })
 
