@@ -1,0 +1,213 @@
+import { Launcher } from '../components/launcher/Launcher'
+import { MessageList } from '../components/messages/MessageList'
+import { Panel } from '../components/panel/Panel'
+import { Suggestions } from '../components/suggestions/Suggestions'
+import { ClipMascot } from '../mascot/ClipMascot'
+import { HttpTransport } from '../transport/HttpTransport'
+import type { Transport } from '../transport/types'
+import { resolveConfig } from './config'
+import {
+  AssistantTransportError,
+  type ClipAssistantConfig,
+  type ClipSource,
+  type ClipTheme,
+  type ConversationMessage,
+  type ResolvedClipAssistantConfig,
+} from './types'
+
+/**
+ * Entry point for the embeddable assistant widget. Renders the launcher,
+ * mascot, and panel, and delegates all AI/RAG work to a Transport — either
+ * the built-in HttpTransport (via `endpoint`) or a consumer-supplied
+ * `transport` implementation.
+ */
+export class ClipAssistant {
+  private readonly config: ResolvedClipAssistantConfig
+  private readonly transport: Transport
+  private readonly root: HTMLElement
+  private readonly launcherMascot: ClipMascot
+  private readonly headerMascot: ClipMascot
+  private readonly launcher: Launcher
+  private readonly panel: Panel
+  private readonly messageList: MessageList
+  private readonly suggestions: Suggestions
+
+  private conversation: ConversationMessage[] = []
+  private open = false
+  private pendingRequest: AbortController | null = null
+
+  constructor(config: ClipAssistantConfig) {
+    this.config = resolveConfig(config)
+    this.transport =
+      this.config.transport ??
+      new HttpTransport({ endpoint: this.config.endpoint as string, headers: this.config.headers })
+
+    this.launcherMascot = new ClipMascot({ assets: this.config.mascotAssets, size: 70 })
+    this.launcher = new Launcher({
+      label: this.config.title,
+      tooltip: this.config.title,
+      mascot: this.launcherMascot,
+      onToggle: () => this.toggle(),
+    })
+
+    this.headerMascot = new ClipMascot({ assets: this.config.mascotAssets, size: 44 })
+    this.headerMascot.setState('open')
+
+    this.messageList = new MessageList()
+
+    this.suggestions = new Suggestions({
+      suggestions: this.config.suggestions,
+      onSelect: (suggestion) => this.ask(suggestion),
+    })
+
+    this.panel = new Panel({
+      title: this.config.title,
+      subtitle: this.config.subtitle,
+      greeting: this.config.greeting,
+      disclosure: this.config.disclosure,
+      hasSuggestions: this.config.suggestions.length > 0,
+      mascot: this.headerMascot,
+      messageList: this.messageList,
+      suggestions: this.suggestions,
+      onClose: () => this.close(),
+      onReset: () => this.reset(),
+      onSubmit: (question) => this.ask(question),
+    })
+    this.panel.setHasConversation(false)
+
+    const launcherLayer = document.createElement('div')
+    launcherLayer.className = 'clip-assistant__launcher-layer'
+    launcherLayer.appendChild(this.launcher.element)
+
+    this.root = document.createElement('div')
+    this.root.className = 'clip-assistant'
+    this.root.setAttribute('data-clip-position', this.config.position)
+    this.root.setAttribute('data-clip-theme', this.config.theme)
+    this.root.setAttribute('data-clip-open', 'false')
+    this.root.append(launcherLayer, this.panel.element)
+
+    const container = this.config.container ?? document.body
+    container.appendChild(this.root)
+
+    if (this.config.openOnLoad) {
+      this.openPanel()
+    }
+  }
+
+  /** Opens the panel. */
+  openPanel(): void {
+    if (this.open) return
+    this.open = true
+    this.root.setAttribute('data-clip-open', 'true')
+    this.panel.open()
+    this.launcher.setExpanded(true)
+    this.panel.focusOnOpen()
+  }
+
+  /** Closes the panel and restores focus to the launcher. */
+  close(): void {
+    if (!this.open) return
+    this.open = false
+    this.root.setAttribute('data-clip-open', 'false')
+    this.panel.close()
+    this.launcher.setExpanded(false)
+    this.launcher.focus()
+  }
+
+  toggle(): void {
+    if (this.open) {
+      this.close()
+    } else {
+      this.openPanel()
+    }
+  }
+
+  isOpen(): boolean {
+    return this.open
+  }
+
+  /** Clears the conversation, returning to the intro/suggestions view. */
+  reset(): void {
+    this.pendingRequest?.abort()
+    this.pendingRequest = null
+    this.conversation = []
+    this.messageList.reset()
+    this.panel.setHasConversation(false)
+    this.launcherMascot.setState('idle')
+    this.headerMascot.setState('open')
+  }
+
+  setTheme(theme: ClipTheme): void {
+    this.root.setAttribute('data-clip-theme', theme)
+  }
+
+  /** Sends a question through the configured transport and renders the result. */
+  async ask(question: string): Promise<void> {
+    const trimmed = question.trim()
+    if (!trimmed) return
+
+    this.pendingRequest?.abort()
+    const controller = new AbortController()
+    this.pendingRequest = controller
+
+    const userMessage: ConversationMessage = { role: 'user', content: trimmed }
+    this.conversation.push(userMessage)
+    this.panel.setHasConversation(true)
+    this.messageList.addMessage(userMessage)
+
+    this.panel.setBusy(true)
+    this.messageList.setThinking(true)
+    this.panel.announce('Clip is thinking…')
+    this.headerMascot.setState('thinking')
+
+    try {
+      const history = this.config.sendHistory
+        ? this.conversation.slice(0, -1).slice(-this.config.historyLimit)
+        : []
+
+      const response = await this.transport.send(
+        { question: trimmed, conversation: history },
+        controller.signal
+      )
+
+      if (controller.signal.aborted) return
+
+      const assistantMessage: ConversationMessage = { role: 'assistant', content: response.answer }
+      this.conversation.push(assistantMessage)
+      this.messageList.setThinking(false)
+      this.messageList.addMessage(assistantMessage, response.sources as ClipSource[] | undefined)
+      this.panel.announce(response.answer)
+    } catch (error) {
+      if (controller.signal.aborted) return
+      this.messageList.setThinking(false)
+      this.handleError(error)
+    } finally {
+      if (!controller.signal.aborted) {
+        this.panel.setBusy(false)
+        this.headerMascot.setState('open')
+        this.pendingRequest = null
+      }
+    }
+  }
+
+  /** Removes the widget from the DOM and cancels any in-flight request. */
+  destroy(): void {
+    this.pendingRequest?.abort()
+    this.launcherMascot.destroy()
+    this.headerMascot.destroy()
+    this.root.remove()
+  }
+
+  private handleError(error: unknown): void {
+    const message =
+      error instanceof AssistantTransportError
+        ? error.message
+        : error instanceof Error
+          ? error.message || 'Something went wrong. Please try again.'
+          : 'Something went wrong. Please try again.'
+    const kind = error instanceof AssistantTransportError ? error.kind : undefined
+
+    this.messageList.showNotice(message, kind)
+    this.panel.announce(message)
+  }
+}
