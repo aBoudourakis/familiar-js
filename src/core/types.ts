@@ -7,7 +7,7 @@ export type ClipPosition = 'bottom-right' | 'bottom-left'
 export type ClipTheme = 'light' | 'dark' | 'auto'
 
 /** Built-in mascot artwork to use. See `src/mascot/presets.ts` for the asset sets. */
-export type ClipMascotPreset = 'clip' | 'lens' | 'seeer' | 'wizard'
+export type ClipMascotPreset = 'Clip' | 'Lens' | 'Seer' | 'Wizard'
 
 /** A single turn in the conversation, sent to and rendered from the backend. */
 export interface ConversationMessage {
@@ -81,10 +81,16 @@ export interface ClipAssistantConfig {
   suggestions?: string[]
   /** Theming mode. */
   theme?: ClipTheme
-  /** Built-in mascot artwork to use. Defaults to `'clip'`. */
+  /** Built-in mascot artwork to use. Defaults to `'Clip'`. */
   mascot?: ClipMascotPreset
   /** Per-state artwork overrides, merged on top of `mascot`. Use this to fully replace the mascot with your own art. */
   mascotAssets?: ClipMascotAssets
+  /**
+   * Include a built-in "Change mascot" suggestion that previews the other
+   * built-in mascots (as their idle artwork) and switches live on pick.
+   * Handled entirely on the client — never sent to your backend. Defaults to true.
+   */
+  mascotPicker?: boolean
   /** Whether to send prior turns as `conversation` context. Defaults to true. */
   sendHistory?: boolean
   /** Maximum number of prior turns included when `sendHistory` is true. */

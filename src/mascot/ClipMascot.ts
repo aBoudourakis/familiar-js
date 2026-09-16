@@ -3,7 +3,7 @@ import { DEFAULT_MASCOT_PRESET, MASCOT_PRESETS } from './presets'
 import { IDLE_BLINK_SEQUENCE, type BlinkPhase, type ClipMascotState } from './states'
 
 export interface ClipMascotOptions {
-  /** Built-in mascot artwork to use as the base. Defaults to `'clip'`. */
+  /** Built-in mascot artwork to use as the base. Defaults to `'Clip'`. */
   preset?: ClipMascotPreset
   /** Per-state artwork overrides, merged on top of `preset`. */
   assets?: ClipMascotAssets
@@ -17,15 +17,17 @@ export interface ClipMascotOptions {
  * Renders and animates the mascot — an illustrated character (see
  * src/assets/design-sources) rather than a generic chatbot icon. Idle
  * cycles through a slow, deliberate blink; every other state holds a single
- * static frame. Ships with two built-in presets ("clip", "lens"); every
- * frame is also replaceable via `assets` so consumers can swap in their own
- * mascot/branding entirely.
+ * static frame. Ships with several built-in presets (see
+ * src/mascot/presets.ts); every frame is also replaceable via `assets` so
+ * consumers can swap in their own mascot/branding entirely.
  */
 export class ClipMascot {
   readonly element: HTMLElement
 
   private readonly image: HTMLImageElement
-  private readonly assets: Required<ClipMascotAssets>
+  private readonly customAssets: ClipMascotAssets
+  private readonly explicitAspectRatio?: number
+  private assets: Required<ClipMascotAssets>
   private state: ClipMascotState = 'idle'
   private blinkPhase: BlinkPhase = 'eyesOpen'
   private blinkTimer: ReturnType<typeof setTimeout> | null = null
@@ -34,7 +36,9 @@ export class ClipMascot {
 
   constructor(options: ClipMascotOptions = {}) {
     const preset = MASCOT_PRESETS[options.preset ?? DEFAULT_MASCOT_PRESET]
-    this.assets = { ...preset.assets, ...options.assets }
+    this.customAssets = options.assets ?? {}
+    this.explicitAspectRatio = options.aspectRatio
+    this.assets = { ...preset.assets, ...this.customAssets }
     this.prefersReducedMotion =
       typeof window !== 'undefined' &&
       typeof window.matchMedia === 'function' &&
@@ -44,7 +48,7 @@ export class ClipMascot {
     this.element.className = 'clip-mascot'
     this.element.setAttribute('data-state', this.state)
     this.element.setAttribute('aria-hidden', 'true')
-    this.element.style.setProperty('--clip-mascot-aspect', String(options.aspectRatio ?? preset.aspectRatio))
+    this.element.style.setProperty('--clip-mascot-aspect', String(this.explicitAspectRatio ?? preset.aspectRatio))
     if (options.size) {
       this.element.style.setProperty('--clip-mascot-size', `${options.size}px`)
     }
@@ -83,6 +87,14 @@ export class ClipMascot {
 
   getState(): ClipMascotState {
     return this.state
+  }
+
+  /** Switches to a different built-in mascot, live. Any custom `assets` overrides still apply on top. */
+  setPreset(preset: ClipMascotPreset): void {
+    const next = MASCOT_PRESETS[preset]
+    this.assets = { ...next.assets, ...this.customAssets }
+    this.element.style.setProperty('--clip-mascot-aspect', String(this.explicitAspectRatio ?? next.aspectRatio))
+    this.applyImage()
   }
 
   destroy(): void {

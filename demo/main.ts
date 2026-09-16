@@ -3,21 +3,14 @@ import { MockTransport } from './mockTransport'
 
 const params = new URLSearchParams(location.search)
 const initialPosition = (params.get('position') as ClipPosition | null) ?? 'bottom-right'
-const initialMascot = (params.get('mascot') as ClipMascotPreset | null) ?? 'clip'
-const MASCOT_LABELS: Record<ClipMascotPreset, string> = {
-  clip: 'Clip',
-  lens: 'Lens',
-  seeer: 'Seeer',
-  wizard: 'Wizard',
-}
-const mascotLabel = MASCOT_LABELS[initialMascot] ?? MASCOT_LABELS.clip
+const initialMascot = (params.get('mascot') as ClipMascotPreset | null) ?? 'Clip'
 
 const assistant = new ClipAssistant({
   transport: new MockTransport(),
   position: initialPosition,
   mascot: initialMascot,
-  title: `Ask ${mascotLabel}`,
-  subtitle: `${mascotLabel} · Demo Assistant`,
+  title: `Ask ${initialMascot}`,
+  subtitle: `${initialMascot} · Demo Assistant`,
   greeting: 'Hi! I can answer questions about this demo and how clip-js works.',
   disclosure: 'This demo runs entirely in your browser — no real backend is called.',
   suggestions: [

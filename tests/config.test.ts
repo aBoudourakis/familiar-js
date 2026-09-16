@@ -11,7 +11,8 @@ describe('resolveConfig', () => {
     expect(config.theme).toBe('auto')
     expect(config.title).toBe('Ask Clip')
     expect(config.greeting).toBe('What would you like to know?')
-    expect(config.mascot).toBe('clip')
+    expect(config.mascot).toBe('Clip')
+    expect(config.mascotPicker).toBe(true)
     expect(config.suggestions).toEqual([])
     expect(config.sendHistory).toBe(true)
     expect(config.historyLimit).toBeGreaterThan(0)
@@ -25,14 +26,14 @@ describe('resolveConfig', () => {
       endpoint: '/api/assistant',
       position: 'bottom-left',
       theme: 'dark',
-      mascot: 'lens',
+      mascot: 'Lens',
       suggestions: ['Hi'],
       sendHistory: false,
     })
 
     expect(config.position).toBe('bottom-left')
     expect(config.theme).toBe('dark')
-    expect(config.mascot).toBe('lens')
+    expect(config.mascot).toBe('Lens')
     expect(config.suggestions).toEqual(['Hi'])
     expect(config.sendHistory).toBe(false)
   })

@@ -1,6 +1,10 @@
+export interface SuggestionItem {
+  label: string
+  onSelect: () => void
+}
+
 export interface SuggestionsOptions {
-  suggestions: string[]
-  onSelect: (suggestion: string) => void
+  items: SuggestionItem[]
 }
 
 /** Shown before the conversation starts. Each chip behaves like typing the question manually. */
@@ -18,19 +22,19 @@ export class Suggestions {
     const list = document.createElement('ul')
     list.className = 'clip-suggestions__list'
 
-    for (const suggestion of options.suggestions) {
-      const item = document.createElement('li')
+    for (const item of options.items) {
+      const li = document.createElement('li')
       const chip = document.createElement('button')
       chip.type = 'button'
       chip.className = 'clip-suggestions__chip'
-      chip.textContent = suggestion
-      chip.addEventListener('click', () => options.onSelect(suggestion))
-      item.appendChild(chip)
-      list.appendChild(item)
+      chip.textContent = item.label
+      chip.addEventListener('click', item.onSelect)
+      li.appendChild(chip)
+      list.appendChild(li)
     }
 
     this.element.append(label, list)
-    this.setVisible(options.suggestions.length > 0)
+    this.setVisible(options.items.length > 0)
   }
 
   setVisible(visible: boolean): void {

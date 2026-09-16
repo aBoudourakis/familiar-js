@@ -148,8 +148,8 @@ describe('ClipAssistant', () => {
     expect(document.querySelector('.clip-panel__intro')?.textContent).toBe('Hello there.')
   })
 
-  it('uses the "lens" mascot preset for the launcher and panel header when configured', () => {
-    new ClipAssistant({ transport, mascot: 'lens' })
+  it('uses the "Lens" mascot preset for the launcher and panel header when configured', () => {
+    new ClipAssistant({ transport, mascot: 'Lens' })
 
     const launcherImg = document.querySelector('.clip-launcher .clip-mascot__image') as HTMLImageElement
     expect(launcherImg.src).toContain('/mascot/Lens/idle.webp')
@@ -158,13 +158,67 @@ describe('ClipAssistant', () => {
     expect(headerImg.src).toContain('/mascot/Lens/focused.webp')
   })
 
-  it('only shows the decorative accent ring for the "clip" mascot preset', () => {
-    new ClipAssistant({ transport, mascot: 'clip' })
-    expect(document.querySelector('.clip-launcher__ring')).toBeTruthy()
+  it('only shows the decorative accent ring for the "Clip" mascot preset', () => {
+    new ClipAssistant({ transport, mascot: 'Clip' })
+    expect(document.querySelector('.clip-launcher__ring')?.hasAttribute('hidden')).toBe(false)
     document.body.innerHTML = ''
 
-    new ClipAssistant({ transport, mascot: 'lens' })
-    expect(document.querySelector('.clip-launcher__ring')).toBeNull()
+    new ClipAssistant({ transport, mascot: 'Lens' })
+    expect(document.querySelector('.clip-launcher__ring')?.hasAttribute('hidden')).toBe(true)
+  })
+
+  it('offers a built-in "Change mascot" suggestion by default', () => {
+    new ClipAssistant({ transport })
+
+    const labels = Array.from(document.querySelectorAll('.clip-suggestions__chip')).map((el) => el.textContent)
+    expect(labels).toContain('Change mascot')
+  })
+
+  it('omits the "Change mascot" suggestion when mascotPicker is disabled', () => {
+    new ClipAssistant({ transport, mascotPicker: false })
+
+    const labels = Array.from(document.querySelectorAll('.clip-suggestions__chip')).map((el) => el.textContent)
+    expect(labels).not.toContain('Change mascot')
+  })
+
+  it('shows a mascot picker reply — one thumbnail per preset — without contacting the transport', () => {
+    new ClipAssistant({ transport })
+
+    const changeMascotChip = Array.from(document.querySelectorAll('.clip-suggestions__chip')).find(
+      (el) => el.textContent === 'Change mascot'
+    ) as HTMLButtonElement
+    changeMascotChip.click()
+
+    expect(transport.calls).toHaveLength(0)
+    const items = document.querySelectorAll('.clip-mascot-picker__item')
+    expect(items).toHaveLength(4)
+    expect(document.querySelector('.clip-mascot-picker__item[data-active="true"]')?.getAttribute('aria-label')).toBe(
+      'Clip (current mascot)'
+    )
+  })
+
+  it('setMascot() switches the launcher/header artwork and the ring live; picking a picker thumbnail does the same', () => {
+    const assistant = new ClipAssistant({ transport })
+
+    assistant.setMascot('Wizard')
+
+    expect(assistant.getMascot()).toBe('Wizard')
+    const launcherImg = document.querySelector('.clip-launcher .clip-mascot__image') as HTMLImageElement
+    expect(launcherImg.src).toContain('/mascot/Wizard/idle.webp')
+    expect(document.querySelector('.clip-launcher__ring')?.hasAttribute('hidden')).toBe(true)
+
+    // Picking a thumbnail from the picker reply does the same thing.
+    const changeMascotChip = Array.from(document.querySelectorAll('.clip-suggestions__chip')).find(
+      (el) => el.textContent === 'Change mascot'
+    ) as HTMLButtonElement
+    changeMascotChip.click()
+    const seerItem = Array.from(document.querySelectorAll('.clip-mascot-picker__item')).find((el) =>
+      el.getAttribute('aria-label')?.includes('Seer')
+    ) as HTMLButtonElement
+    seerItem.click()
+
+    expect(assistant.getMascot()).toBe('Seer')
+    expect(launcherImg.src).toContain('/mascot/Seer/idle.webp')
   })
 
   it('destroy() removes the widget from the DOM', () => {

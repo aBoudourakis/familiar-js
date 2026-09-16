@@ -1,5 +1,6 @@
-import type { ClipSource, ConversationMessage } from '../../core/types'
+import type { ClipMascotPreset, ClipSource, ConversationMessage } from '../../core/types'
 import { errorIcon } from '../icons'
+import { renderMascotPicker } from './MascotPicker'
 import { renderSourceList } from '../sources/SourceList'
 
 export type MessageTone = 'default' | 'muted' | 'notice'
@@ -68,6 +69,14 @@ export class MessageList {
     if (kind) {
       row.querySelector('.clip-message--assistant')?.setAttribute('data-notice-kind', kind)
     }
+    this.element.appendChild(row)
+    this.scrollToBottom()
+  }
+
+  /** Renders the built-in mascot picker as an assistant reply — handled entirely on the client. */
+  addMascotPicker(current: ClipMascotPreset, onSelect: (preset: ClipMascotPreset) => void): void {
+    const row = this.createRow('assistant', 'Here are the built-in mascots — pick one:', 'default')
+    row.querySelector('.clip-message__content')?.appendChild(renderMascotPicker({ current, onSelect }))
     this.element.appendChild(row)
     this.scrollToBottom()
   }

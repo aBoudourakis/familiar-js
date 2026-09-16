@@ -9,7 +9,7 @@ describe('ClipMascot', () => {
     mascot = null
   })
 
-  it('renders an <img> defaulting to the built-in "clip" idle illustration', () => {
+  it('renders an <img> defaulting to the built-in "Clip" idle illustration', () => {
     mascot = new ClipMascot()
 
     expect(mascot.element.getAttribute('data-state')).toBe('idle')
@@ -35,8 +35,8 @@ describe('ClipMascot', () => {
     expect(img.src).toContain('/mascot/Clip/thinking.webp')
   })
 
-  it('loads the "lens" preset\'s own artwork when selected', () => {
-    mascot = new ClipMascot({ preset: 'lens' })
+  it('loads the "Lens" preset\'s own artwork when selected', () => {
+    mascot = new ClipMascot({ preset: 'Lens' })
 
     const img = mascot.element.querySelector('img') as HTMLImageElement
     expect(img.src).toContain('/mascot/Lens/idle.webp')
@@ -45,29 +45,29 @@ describe('ClipMascot', () => {
     expect(img.src).toContain('/mascot/Lens/focused.webp')
   })
 
-  it('loads the "seeer" preset\'s own artwork when selected', () => {
-    mascot = new ClipMascot({ preset: 'seeer' })
+  it('loads the "Seer" preset\'s own artwork when selected', () => {
+    mascot = new ClipMascot({ preset: 'Seer' })
 
     const img = mascot.element.querySelector('img') as HTMLImageElement
-    expect(img.src).toContain('/mascot/seeer/idle.webp')
+    expect(img.src).toContain('/mascot/Seer/idle.webp')
 
     mascot.setState('open')
-    expect(img.src).toContain('/mascot/seeer/focused.webp')
+    expect(img.src).toContain('/mascot/Seer/focused.webp')
   })
 
-  it('loads the "wizard" preset\'s own artwork when selected', () => {
-    mascot = new ClipMascot({ preset: 'wizard' })
+  it('loads the "Wizard" preset\'s own artwork when selected', () => {
+    mascot = new ClipMascot({ preset: 'Wizard' })
 
     const img = mascot.element.querySelector('img') as HTMLImageElement
-    expect(img.src).toContain('/mascot/wizard/idle.webp')
+    expect(img.src).toContain('/mascot/Wizard/idle.webp')
 
     mascot.setState('open')
-    expect(img.src).toContain('/mascot/wizard/focused.webp')
+    expect(img.src).toContain('/mascot/Wizard/focused.webp')
   })
 
-  it('uses a preset-specific aspect ratio (clip is portrait, lens is square)', () => {
-    const clip = new ClipMascot({ preset: 'clip' })
-    const lens = new ClipMascot({ preset: 'lens' })
+  it('uses a preset-specific aspect ratio (Clip is portrait, Lens is square)', () => {
+    const clip = new ClipMascot({ preset: 'Clip' })
+    const lens = new ClipMascot({ preset: 'Lens' })
 
     expect(clip.element.style.getPropertyValue('--clip-mascot-aspect')).not.toBe(
       lens.element.style.getPropertyValue('--clip-mascot-aspect')
@@ -89,8 +89,23 @@ describe('ClipMascot', () => {
     mascot.setState('thinking')
     expect(img.src).toContain('/thinking.png')
 
-    // 'open' has no override — falls back to the built-in "clip" illustration.
+    // 'open' has no override — falls back to the built-in "Clip" illustration.
     mascot.setState('open')
     expect(img.src).toContain('/mascot/Clip/focused.webp')
+  })
+
+  it('setPreset() switches artwork and aspect ratio live, keeping custom overrides on top', () => {
+    mascot = new ClipMascot({ preset: 'Clip', assets: { idle: '/custom-idle.png' } })
+    const img = mascot.element.querySelector('img') as HTMLImageElement
+    expect(img.src).toContain('/custom-idle.png')
+
+    mascot.setPreset('Lens')
+
+    // Custom override still wins for 'idle'...
+    expect(img.src).toContain('/custom-idle.png')
+    // ...but a state with no override now comes from Lens, not Clip.
+    mascot.setState('open')
+    expect(img.src).toContain('/mascot/Lens/focused.webp')
+    expect(Number(mascot.element.style.getPropertyValue('--clip-mascot-aspect'))).toBe(1)
   })
 })

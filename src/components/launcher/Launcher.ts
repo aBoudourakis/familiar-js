@@ -21,6 +21,7 @@ export class Launcher {
   readonly element: HTMLButtonElement
 
   private readonly mascot: ClipMascot
+  private readonly ring: HTMLSpanElement
 
   constructor(options: LauncherOptions) {
     this.mascot = options.mascot
@@ -41,22 +42,22 @@ export class Launcher {
     tooltip.setAttribute('role', 'tooltip')
     tooltip.textContent = options.tooltip
 
-    this.element.append(tooltip)
+    this.ring = document.createElement('span')
+    this.ring.className = 'clip-launcher__ring'
+    this.ring.setAttribute('aria-hidden', 'true')
+    this.ring.hidden = !(options.showRing ?? true)
 
-    if (options.showRing ?? true) {
-      const ring = document.createElement('span')
-      ring.className = 'clip-launcher__ring'
-      ring.setAttribute('aria-hidden', 'true')
-      this.element.append(ring)
-    }
-
-    this.element.append(this.mascot.element)
+    this.element.append(tooltip, this.ring, this.mascot.element)
 
     this.element.addEventListener('click', options.onToggle)
     this.element.addEventListener('pointerenter', () => this.setHovering(true))
     this.element.addEventListener('pointerleave', () => this.setHovering(false))
     this.element.addEventListener('focus', () => this.setHovering(true))
     this.element.addEventListener('blur', () => this.setHovering(false))
+  }
+
+  setShowRing(show: boolean): void {
+    this.ring.hidden = !show
   }
 
   setExpanded(expanded: boolean): void {

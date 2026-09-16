@@ -10,18 +10,18 @@ import lensFocused from '../assets/mascot/Lens/focused.webp'
 import lensHover from '../assets/mascot/Lens/hover.webp'
 import lensIdle from '../assets/mascot/Lens/idle.webp'
 import lensThinking from '../assets/mascot/Lens/thinking.webp'
-import seeerClosed from '../assets/mascot/seeer/closed.webp'
-import seeerClosing from '../assets/mascot/seeer/closing.webp'
-import seeerFocused from '../assets/mascot/seeer/focused.webp'
-import seeerHover from '../assets/mascot/seeer/hover.webp'
-import seeerIdle from '../assets/mascot/seeer/idle.webp'
-import seeerThinking from '../assets/mascot/seeer/thinking.webp'
-import wizardClosed from '../assets/mascot/wizard/closed.webp'
-import wizardClosing from '../assets/mascot/wizard/closing.webp'
-import wizardFocused from '../assets/mascot/wizard/focused.webp'
-import wizardHover from '../assets/mascot/wizard/hover.webp'
-import wizardIdle from '../assets/mascot/wizard/idle.webp'
-import wizardThinking from '../assets/mascot/wizard/thinking.webp'
+import seerClosed from '../assets/mascot/Seer/closed.webp'
+import seerClosing from '../assets/mascot/Seer/closing.webp'
+import seerFocused from '../assets/mascot/Seer/focused.webp'
+import seerHover from '../assets/mascot/Seer/hover.webp'
+import seerIdle from '../assets/mascot/Seer/idle.webp'
+import seerThinking from '../assets/mascot/Seer/thinking.webp'
+import wizardClosed from '../assets/mascot/Wizard/closed.webp'
+import wizardClosing from '../assets/mascot/Wizard/closing.webp'
+import wizardFocused from '../assets/mascot/Wizard/focused.webp'
+import wizardHover from '../assets/mascot/Wizard/hover.webp'
+import wizardIdle from '../assets/mascot/Wizard/idle.webp'
+import wizardThinking from '../assets/mascot/Wizard/thinking.webp'
 import type { ClipMascotAssets, ClipMascotPreset } from '../core/types'
 
 export interface MascotPresetDefinition {
@@ -31,7 +31,7 @@ export interface MascotPresetDefinition {
 }
 
 export const MASCOT_PRESETS: Record<ClipMascotPreset, MascotPresetDefinition> = {
-  clip: {
+  Clip: {
     // Native 1129x1393 source art.
     aspectRatio: 1393 / 1129,
     assets: {
@@ -43,7 +43,7 @@ export const MASCOT_PRESETS: Record<ClipMascotPreset, MascotPresetDefinition> = 
       eyesClosed: clipClosed,
     },
   },
-  lens: {
+  Lens: {
     // Native 300x300 source art.
     aspectRatio: 300 / 300,
     assets: {
@@ -55,19 +55,19 @@ export const MASCOT_PRESETS: Record<ClipMascotPreset, MascotPresetDefinition> = 
       eyesClosed: lensClosed,
     },
   },
-  seeer: {
+  Seer: {
     // Native 300x300 source art.
     aspectRatio: 300 / 300,
     assets: {
-      idle: seeerIdle,
-      hover: seeerHover,
-      thinking: seeerThinking,
-      open: seeerFocused,
-      eyesClosing: seeerClosing,
-      eyesClosed: seeerClosed,
+      idle: seerIdle,
+      hover: seerHover,
+      thinking: seerThinking,
+      open: seerFocused,
+      eyesClosing: seerClosing,
+      eyesClosed: seerClosed,
     },
   },
-  wizard: {
+  Wizard: {
     // Native 300x300 source art.
     aspectRatio: 300 / 300,
     assets: {
@@ -81,4 +81,7 @@ export const MASCOT_PRESETS: Record<ClipMascotPreset, MascotPresetDefinition> = 
   },
 }
 
-export const DEFAULT_MASCOT_PRESET: ClipMascotPreset = 'clip'
+export const DEFAULT_MASCOT_PRESET: ClipMascotPreset = 'Clip'
+
+/** All built-in preset keys, in display order. */
+export const MASCOT_PRESET_NAMES = Object.keys(MASCOT_PRESETS) as ClipMascotPreset[]
