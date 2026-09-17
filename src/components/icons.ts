@@ -29,6 +29,13 @@ export function errorIcon(): SVGSVGElement {
   )
 }
 
+export function chevronDownIcon(): SVGSVGElement {
+  return svg(
+    '0 0 24 24',
+    '<path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />'
+  )
+}
+
 export function externalLinkIcon(): SVGSVGElement {
   return svg(
     '0 0 24 24',

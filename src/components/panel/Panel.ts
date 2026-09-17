@@ -1,5 +1,7 @@
+import type { FamiliarMascotPreset } from '../../core/types'
 import { FamiliarMascot } from '../../mascot/FamiliarMascot'
-import { closeIcon, sendIcon } from '../icons'
+import { chevronDownIcon, closeIcon, sendIcon } from '../icons'
+import { renderMascotPicker } from '../messages/MascotPicker'
 import { MessageList } from '../messages/MessageList'
 import { Suggestions } from '../suggestions/Suggestions'
 
@@ -10,11 +12,14 @@ export interface PanelOptions {
   disclosure?: string
   hasSuggestions: boolean
   mascot: FamiliarMascot
+  currentMascot: FamiliarMascotPreset
   messageList: MessageList
   suggestions: Suggestions
   onClose: () => void
   onReset: () => void
   onSubmit: (question: string) => void
+  /** Switches the mascot live from the header dropdown, without closing the panel. */
+  onSelectMascot: (preset: FamiliarMascotPreset) => void
 }
 
 const FOCUSABLE_SELECTOR =
@@ -35,14 +40,33 @@ export class Panel {
   private readonly liveRegion: HTMLDivElement
   private readonly textarea: HTMLTextAreaElement
   private readonly sendButton: HTMLButtonElement
+  private readonly mascotTrigger: HTMLButtonElement
+  private readonly mascotDropdown: HTMLDivElement
   private readonly onClose: () => void
+  private readonly onSelectMascot: (preset: FamiliarMascotPreset) => void
   private readonly hasGreeting: boolean
   private readonly hasSuggestions: boolean
   private readonly suggestions: Suggestions
   private readonly messageList: MessageList
+  private currentMascot: FamiliarMascotPreset
+  private mascotDropdownOpen = false
+
+  // Capture-phase so this runs before a click on a picker card reaches that
+  // card's own listener — closing the dropdown here must not swallow the pick.
+  private readonly handleOutsideClick = (event: MouseEvent): void => {
+    if (
+      event.target instanceof Node &&
+      (this.mascotTrigger.contains(event.target) || this.mascotDropdown.contains(event.target))
+    ) {
+      return
+    }
+    this.closeMascotDropdown()
+  }
 
   constructor(options: PanelOptions) {
     this.onClose = options.onClose
+    this.onSelectMascot = options.onSelectMascot
+    this.currentMascot = options.currentMascot
     this.hasGreeting = Boolean(options.greeting)
     this.hasSuggestions = options.hasSuggestions
     this.suggestions = options.suggestions
@@ -83,7 +107,24 @@ export class Panel {
     this.closeButton.appendChild(closeIcon())
     this.closeButton.addEventListener('click', () => this.onClose())
 
-    header.append(options.mascot.element, headerText, this.closeButton)
+    this.mascotTrigger = document.createElement('button')
+    this.mascotTrigger.type = 'button'
+    this.mascotTrigger.className = 'familiar-panel__mascot-trigger'
+    this.mascotTrigger.setAttribute('aria-haspopup', 'true')
+    this.mascotTrigger.setAttribute('aria-expanded', 'false')
+    this.mascotTrigger.setAttribute('aria-label', 'Change mascot')
+    this.mascotTrigger.append(options.mascot.element, chevronDownIcon())
+    this.mascotTrigger.addEventListener('click', () => this.toggleMascotDropdown())
+
+    this.mascotDropdown = document.createElement('div')
+    this.mascotDropdown.className = 'familiar-mascot-dropdown'
+    this.mascotDropdown.hidden = true
+
+    const mascotSwitcher = document.createElement('div')
+    mascotSwitcher.className = 'familiar-panel__mascot-switcher'
+    mascotSwitcher.append(this.mascotTrigger, this.mascotDropdown)
+
+    header.append(mascotSwitcher, headerText, this.closeButton)
 
     // Intro
     this.introEl = document.createElement('p')
@@ -161,6 +202,7 @@ export class Panel {
 
   close(): void {
     this.element.hidden = true
+    this.closeMascotDropdown()
   }
 
   /** Focuses the close button — the top of the dialog — rather than jumping straight to the input. */
@@ -171,6 +213,11 @@ export class Panel {
   setBusy(busy: boolean): void {
     this.textarea.disabled = busy
     this.sendButton.disabled = busy
+  }
+
+  /** Keeps the header dropdown's active-state highlight in sync when the mascot changes elsewhere. */
+  setCurrentMascot(preset: FamiliarMascotPreset): void {
+    this.currentMascot = preset
   }
 
   /** Toggles between the pre-conversation intro/suggestions and the message transcript. */
@@ -192,10 +239,52 @@ export class Panel {
     onSubmit(value)
   }
 
+  private toggleMascotDropdown(): void {
+    if (this.mascotDropdownOpen) this.closeMascotDropdown()
+    else this.openMascotDropdown()
+  }
+
+  /**
+   * Quick mascot switcher anchored to the header portrait — deliberately
+   * separate from the "Change mascot" suggestion reply: picking here swaps
+   * the mascot live without closing the panel or touching the conversation.
+   */
+  private openMascotDropdown(): void {
+    if (this.mascotDropdownOpen) return
+    this.mascotDropdownOpen = true
+    this.mascotDropdown.replaceChildren(
+      renderMascotPicker({
+        current: this.currentMascot,
+        onSelect: (preset) => {
+          this.onSelectMascot(preset)
+          this.closeMascotDropdown()
+          this.mascotTrigger.focus()
+        },
+      })
+    )
+    this.mascotDropdown.hidden = false
+    this.mascotTrigger.setAttribute('aria-expanded', 'true')
+    document.addEventListener('click', this.handleOutsideClick, true)
+  }
+
+  private closeMascotDropdown(): void {
+    if (!this.mascotDropdownOpen) return
+    this.mascotDropdownOpen = false
+    this.mascotDropdown.hidden = true
+    this.mascotDropdown.replaceChildren()
+    this.mascotTrigger.setAttribute('aria-expanded', 'false')
+    document.removeEventListener('click', this.handleOutsideClick, true)
+  }
+
   private handleKeydown(event: KeyboardEvent): void {
     if (event.key === 'Escape') {
       event.preventDefault()
-      this.onClose()
+      if (this.mascotDropdownOpen) {
+        this.closeMascotDropdown()
+        this.mascotTrigger.focus()
+      } else {
+        this.onClose()
+      }
       return
     }
 

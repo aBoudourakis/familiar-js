@@ -236,6 +236,60 @@ describe('FamiliarAssistant', () => {
     expect(launcherImg.src).toContain('/mascot/Seer/idle.webp')
   })
 
+  it('closes the panel after picking a mascot from the picker', () => {
+    const assistant = new FamiliarAssistant({ transport })
+    assistant.openPanel()
+    expect(assistant.isOpen()).toBe(true)
+
+    const changeMascotChip = Array.from(document.querySelectorAll('.familiar-suggestions__chip')).find(
+      (el) => el.textContent === 'Change mascot'
+    ) as HTMLButtonElement
+    changeMascotChip.click()
+    const wizardItem = Array.from(document.querySelectorAll('.familiar-mascot-picker__item')).find((el) =>
+      el.getAttribute('aria-label')?.includes('Wizard')
+    ) as HTMLButtonElement
+    wizardItem.click()
+
+    expect(assistant.getMascot()).toBe('Wizard')
+    expect(assistant.isOpen()).toBe(false)
+  })
+
+  it('opens a mascot dropdown from the header portrait and switches live without closing the panel', () => {
+    const assistant = new FamiliarAssistant({ transport })
+    assistant.openPanel()
+
+    const mascotTrigger = document.querySelector('.familiar-panel__mascot-trigger') as HTMLButtonElement
+    expect(mascotTrigger).toBeTruthy()
+    mascotTrigger.click()
+
+    const dropdown = document.querySelector('.familiar-mascot-dropdown') as HTMLElement
+    expect(dropdown.hidden).toBe(false)
+    const items = dropdown.querySelectorAll('.familiar-mascot-picker__item')
+    expect(items).toHaveLength(4)
+
+    const lensItem = Array.from(items).find((el) => el.getAttribute('aria-label')?.includes('Lens')) as HTMLButtonElement
+    lensItem.click()
+
+    expect(assistant.getMascot()).toBe('Lens')
+    expect(assistant.isOpen()).toBe(true)
+    expect(dropdown.hidden).toBe(true)
+  })
+
+  it('closes the header mascot dropdown on an outside click, without closing the panel', () => {
+    const assistant = new FamiliarAssistant({ transport })
+    assistant.openPanel()
+
+    const mascotTrigger = document.querySelector('.familiar-panel__mascot-trigger') as HTMLButtonElement
+    mascotTrigger.click()
+    const dropdown = document.querySelector('.familiar-mascot-dropdown') as HTMLElement
+    expect(dropdown.hidden).toBe(false)
+
+    document.body.click()
+
+    expect(dropdown.hidden).toBe(true)
+    expect(assistant.isOpen()).toBe(true)
+  })
+
   it('destroy() removes the widget from the DOM', () => {
     const assistant = new FamiliarAssistant({ transport })
     expect(document.querySelector('.familiar-assistant')).toBeTruthy()

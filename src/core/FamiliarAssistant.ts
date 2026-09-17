@@ -87,11 +87,13 @@ export class FamiliarAssistant {
       disclosure: this.config.disclosure,
       hasSuggestions: suggestionItems.length > 0,
       mascot: this.headerMascot,
+      currentMascot: this.currentMascot,
       messageList: this.messageList,
       suggestions: this.suggestions,
       onClose: () => this.close(),
       onReset: () => this.reset(),
       onSubmit: (question) => this.ask(question),
+      onSelectMascot: (preset) => this.setMascot(preset),
     })
     this.panel.setHasConversation(false)
 
@@ -169,6 +171,7 @@ export class FamiliarAssistant {
     this.headerMascot.setPreset(preset)
     // The gold accent ring was designed around Clip's silhouette; other presets sit on their own.
     this.launcher.setShowRing(preset === 'Clip')
+    this.panel.setCurrentMascot(preset)
   }
 
   getMascot(): FamiliarMascotPreset {
@@ -183,7 +186,10 @@ export class FamiliarAssistant {
   private showMascotPicker(): void {
     this.panel.setHasConversation(true)
     this.messageList.addMessage({ role: 'user', content: CHANGE_MASCOT_LABEL })
-    this.messageList.addMascotPicker(this.currentMascot, (preset) => this.setMascot(preset))
+    this.messageList.addMascotPicker(this.currentMascot, (preset) => {
+      this.setMascot(preset)
+      this.close()
+    })
     this.panel.announce('Choose a mascot.')
   }
 

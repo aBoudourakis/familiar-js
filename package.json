@@ -1,6 +1,6 @@
 {
   "name": "familiar-js",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "description": "A lightweight, reusable JavaScript AI assistant widget with pluggable AI/RAG backends, suggested questions, theming, responsive UI, and the Clip mascot.",
   "type": "module",
   "license": "MIT",
