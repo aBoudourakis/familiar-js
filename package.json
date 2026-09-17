@@ -7,11 +7,11 @@
   "author": "Athinodoros Boudourakis",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/aBoudourakis/clip-js.git"
+    "url": "git+https://github.com/aBoudourakis/familiar-js.git"
   },
-  "homepage": "https://github.com/aBoudourakis/clip-js#readme",
+  "homepage": "https://github.com/aBoudourakis/familiar-js#readme",
   "bugs": {
-    "url": "https://github.com/aBoudourakis/clip-js/issues"
+    "url": "https://github.com/aBoudourakis/familiar-js/issues"
   },
   "keywords": [
     "ai",
