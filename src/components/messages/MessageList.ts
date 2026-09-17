@@ -1,4 +1,4 @@
-import type { ClipMascotPreset, ClipSource, ConversationMessage } from '../../core/types'
+import type { FamiliarMascotPreset, FamiliarSource, ConversationMessage } from '../../core/types'
 import { errorIcon } from '../icons'
 import { renderMascotPicker } from './MascotPicker'
 import { renderSourceList } from '../sources/SourceList'
@@ -17,7 +17,7 @@ export class MessageList {
 
   constructor() {
     this.element = document.createElement('div')
-    this.element.className = 'clip-messages'
+    this.element.className = 'familiar-messages'
     this.element.hidden = true
   }
 
@@ -25,10 +25,10 @@ export class MessageList {
     this.element.hidden = !visible
   }
 
-  addMessage(message: ConversationMessage, sources?: ClipSource[]): void {
+  addMessage(message: ConversationMessage, sources?: FamiliarSource[]): void {
     const row = this.createRow(message.role, message.content, 'default')
     if (sources && sources.length > 0) {
-      row.querySelector('.clip-message__content')?.appendChild(renderSourceList(sources))
+      row.querySelector('.familiar-message__content')?.appendChild(renderSourceList(sources))
     }
     this.element.appendChild(row)
     this.scrollToBottom()
@@ -37,14 +37,14 @@ export class MessageList {
   setThinking(thinking: boolean): void {
     if (thinking && !this.thinkingEl) {
       const row = document.createElement('div')
-      row.className = 'clip-message-row'
+      row.className = 'familiar-message-row'
       row.setAttribute('data-role', 'assistant')
 
       const block = document.createElement('div')
-      block.className = 'clip-message clip-message--assistant'
+      block.className = 'familiar-message familiar-message--assistant'
       block.setAttribute('data-tone', 'thinking')
       block.innerHTML = `
-        <span class="clip-thinking-dots">
+        <span class="familiar-thinking-dots">
           <span></span><span></span><span></span>
         </span>
       `
@@ -67,16 +67,16 @@ export class MessageList {
   showNotice(message: string, kind?: string): void {
     const row = this.createRow('assistant', message, 'notice')
     if (kind) {
-      row.querySelector('.clip-message--assistant')?.setAttribute('data-notice-kind', kind)
+      row.querySelector('.familiar-message--assistant')?.setAttribute('data-notice-kind', kind)
     }
     this.element.appendChild(row)
     this.scrollToBottom()
   }
 
   /** Renders the built-in mascot picker as an assistant reply — handled entirely on the client. */
-  addMascotPicker(current: ClipMascotPreset, onSelect: (preset: ClipMascotPreset) => void): void {
+  addMascotPicker(current: FamiliarMascotPreset, onSelect: (preset: FamiliarMascotPreset) => void): void {
     const row = this.createRow('assistant', 'Here are the built-in mascots — pick one:', 'default')
-    row.querySelector('.clip-message__content')?.appendChild(renderMascotPicker({ current, onSelect }))
+    row.querySelector('.familiar-message__content')?.appendChild(renderMascotPicker({ current, onSelect }))
     this.element.appendChild(row)
     this.scrollToBottom()
   }
@@ -92,19 +92,19 @@ export class MessageList {
 
   private createRow(role: ConversationMessage['role'], text: string, tone: MessageTone): HTMLDivElement {
     const row = document.createElement('div')
-    row.className = 'clip-message-row'
+    row.className = 'familiar-message-row'
     row.setAttribute('data-role', role)
 
     if (role === 'user') {
       const bubble = document.createElement('p')
-      bubble.className = 'clip-message clip-message--user'
+      bubble.className = 'familiar-message familiar-message--user'
       bubble.textContent = text
       row.appendChild(bubble)
       return row
     }
 
     const block = document.createElement('div')
-    block.className = 'clip-message clip-message--assistant'
+    block.className = 'familiar-message familiar-message--assistant'
     block.setAttribute('data-tone', tone)
 
     if (tone === 'notice') {
@@ -112,9 +112,9 @@ export class MessageList {
     }
 
     const content = document.createElement('div')
-    content.className = 'clip-message__content'
+    content.className = 'familiar-message__content'
     const paragraph = document.createElement('p')
-    paragraph.className = 'clip-message__text'
+    paragraph.className = 'familiar-message__text'
     paragraph.textContent = text
     content.appendChild(paragraph)
     block.appendChild(content)

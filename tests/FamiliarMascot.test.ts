@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, it } from 'vitest'
-import { ClipMascot } from '../src/mascot/ClipMascot'
+import { FamiliarMascot } from '../src/mascot/FamiliarMascot'
 
-describe('ClipMascot', () => {
-  let mascot: ClipMascot | null = null
+describe('FamiliarMascot', () => {
+  let mascot: FamiliarMascot | null = null
 
   afterEach(() => {
     mascot?.destroy()
@@ -10,7 +10,7 @@ describe('ClipMascot', () => {
   })
 
   it('renders an <img> defaulting to the built-in "Clip" idle illustration', () => {
-    mascot = new ClipMascot()
+    mascot = new FamiliarMascot()
 
     expect(mascot.element.getAttribute('data-state')).toBe('idle')
     const img = mascot.element.querySelector('img') as HTMLImageElement
@@ -19,13 +19,13 @@ describe('ClipMascot', () => {
   })
 
   it('is decorative (aria-hidden) since the launcher/panel supply their own accessible name', () => {
-    mascot = new ClipMascot()
+    mascot = new FamiliarMascot()
 
     expect(mascot.element.getAttribute('aria-hidden')).toBe('true')
   })
 
   it('updates data-state, getState(), and the image src when transitioning states', () => {
-    mascot = new ClipMascot()
+    mascot = new FamiliarMascot()
 
     mascot.setState('thinking')
 
@@ -36,7 +36,7 @@ describe('ClipMascot', () => {
   })
 
   it('loads the "Lens" preset\'s own artwork when selected', () => {
-    mascot = new ClipMascot({ preset: 'Lens' })
+    mascot = new FamiliarMascot({ preset: 'Lens' })
 
     const img = mascot.element.querySelector('img') as HTMLImageElement
     expect(img.src).toContain('/mascot/Lens/idle.webp')
@@ -46,7 +46,7 @@ describe('ClipMascot', () => {
   })
 
   it('loads the "Seer" preset\'s own artwork when selected', () => {
-    mascot = new ClipMascot({ preset: 'Seer' })
+    mascot = new FamiliarMascot({ preset: 'Seer' })
 
     const img = mascot.element.querySelector('img') as HTMLImageElement
     expect(img.src).toContain('/mascot/Seer/idle.webp')
@@ -56,7 +56,7 @@ describe('ClipMascot', () => {
   })
 
   it('loads the "Wizard" preset\'s own artwork when selected', () => {
-    mascot = new ClipMascot({ preset: 'Wizard' })
+    mascot = new FamiliarMascot({ preset: 'Wizard' })
 
     const img = mascot.element.querySelector('img') as HTMLImageElement
     expect(img.src).toContain('/mascot/Wizard/idle.webp')
@@ -66,20 +66,20 @@ describe('ClipMascot', () => {
   })
 
   it('uses a preset-specific aspect ratio (Clip is portrait, Lens is square)', () => {
-    const clip = new ClipMascot({ preset: 'Clip' })
-    const lens = new ClipMascot({ preset: 'Lens' })
+    const clip = new FamiliarMascot({ preset: 'Clip' })
+    const lens = new FamiliarMascot({ preset: 'Lens' })
 
-    expect(clip.element.style.getPropertyValue('--clip-mascot-aspect')).not.toBe(
-      lens.element.style.getPropertyValue('--clip-mascot-aspect')
+    expect(clip.element.style.getPropertyValue('--familiar-mascot-aspect')).not.toBe(
+      lens.element.style.getPropertyValue('--familiar-mascot-aspect')
     )
-    expect(Number(lens.element.style.getPropertyValue('--clip-mascot-aspect'))).toBe(1)
+    expect(Number(lens.element.style.getPropertyValue('--familiar-mascot-aspect'))).toBe(1)
 
     clip.destroy()
     lens.destroy()
   })
 
   it('swaps in a custom asset per state, falling back to the selected preset for unset states', () => {
-    mascot = new ClipMascot({
+    mascot = new FamiliarMascot({
       assets: { idle: '/idle.png', thinking: '/thinking.png' },
     })
 
@@ -95,7 +95,7 @@ describe('ClipMascot', () => {
   })
 
   it('setPreset() switches artwork and aspect ratio live, keeping custom overrides on top', () => {
-    mascot = new ClipMascot({ preset: 'Clip', assets: { idle: '/custom-idle.png' } })
+    mascot = new FamiliarMascot({ preset: 'Clip', assets: { idle: '/custom-idle.png' } })
     const img = mascot.element.querySelector('img') as HTMLImageElement
     expect(img.src).toContain('/custom-idle.png')
 
@@ -106,6 +106,6 @@ describe('ClipMascot', () => {
     // ...but a state with no override now comes from Lens, not Clip.
     mascot.setState('open')
     expect(img.src).toContain('/mascot/Lens/focused.webp')
-    expect(Number(mascot.element.style.getPropertyValue('--clip-mascot-aspect'))).toBe(1)
+    expect(Number(mascot.element.style.getPropertyValue('--familiar-mascot-aspect'))).toBe(1)
   })
 })

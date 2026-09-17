@@ -1,20 +1,20 @@
-import { ClipAssistant, type ClipMascotPreset, type ClipPosition, type ClipTheme } from '../src'
+import { FamiliarAssistant, type FamiliarMascotPreset, type FamiliarPosition, type FamiliarTheme } from '../src'
 import { MockTransport } from './mockTransport'
 
 const params = new URLSearchParams(location.search)
-const initialPosition = (params.get('position') as ClipPosition | null) ?? 'bottom-right'
-const initialMascot = (params.get('mascot') as ClipMascotPreset | null) ?? 'Clip'
+const initialPosition = (params.get('position') as FamiliarPosition | null) ?? 'bottom-right'
+const initialMascot = (params.get('mascot') as FamiliarMascotPreset | null) ?? 'Clip'
 
-const assistant = new ClipAssistant({
+const assistant = new FamiliarAssistant({
   transport: new MockTransport(),
   position: initialPosition,
   mascot: initialMascot,
   title: `Ask ${initialMascot}`,
   subtitle: `${initialMascot} · Demo Assistant`,
-  greeting: 'Hi! I can answer questions about this demo and how clip-js works.',
+  greeting: 'Hi! I can answer questions about this demo and how familiar-js works.',
   disclosure: 'This demo runs entirely in your browser — no real backend is called.',
   suggestions: [
-    'Tell me about clip-js',
+    'Tell me about familiar-js',
     'What technologies are used?',
     'Try a simulated error',
     'Try a simulated rate limit',
@@ -43,7 +43,7 @@ mascotSelect?.addEventListener('change', () => {
 })
 
 themeSelect?.addEventListener('change', () => {
-  assistant.setTheme(themeSelect.value as ClipTheme)
+  assistant.setTheme(themeSelect.value as FamiliarTheme)
 })
 
 openButton?.addEventListener('click', () => {

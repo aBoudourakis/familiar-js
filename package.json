@@ -1,6 +1,6 @@
 {
-  "name": "clip-js",
-  "version": "0.3.1",
+  "name": "familiar-js",
+  "version": "0.4.0",
   "description": "A lightweight, reusable JavaScript AI assistant widget with pluggable AI/RAG backends, suggested questions, theming, responsive UI, and the Clip mascot.",
   "type": "module",
   "license": "UNLICENSED",
@@ -16,16 +16,16 @@
   "files": [
     "dist"
   ],
-  "main": "./dist/clip-js.umd.cjs",
-  "module": "./dist/clip-js.js",
+  "main": "./dist/familiar-js.umd.cjs",
+  "module": "./dist/familiar-js.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/clip-js.js",
-      "require": "./dist/clip-js.umd.cjs"
+      "import": "./dist/familiar-js.js",
+      "require": "./dist/familiar-js.umd.cjs"
     },
-    "./styles.css": "./dist/clip-js.css"
+    "./styles.css": "./dist/familiar-js.css"
   },
   "sideEffects": [
     "**/*.css"

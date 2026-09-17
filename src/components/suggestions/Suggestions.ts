@@ -13,20 +13,20 @@ export class Suggestions {
 
   constructor(options: SuggestionsOptions) {
     this.element = document.createElement('div')
-    this.element.className = 'clip-suggestions'
+    this.element.className = 'familiar-suggestions'
 
     const label = document.createElement('p')
-    label.className = 'clip-suggestions__label'
+    label.className = 'familiar-suggestions__label'
     label.textContent = 'Suggested questions'
 
     const list = document.createElement('ul')
-    list.className = 'clip-suggestions__list'
+    list.className = 'familiar-suggestions__list'
 
     for (const item of options.items) {
       const li = document.createElement('li')
       const chip = document.createElement('button')
       chip.type = 'button'
-      chip.className = 'clip-suggestions__chip'
+      chip.className = 'familiar-suggestions__chip'
       chip.textContent = item.label
       chip.addEventListener('click', item.onSelect)
       li.appendChild(chip)

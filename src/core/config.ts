@@ -1,11 +1,11 @@
-import type { ClipAssistantConfig, ResolvedClipAssistantConfig } from './types'
+import type { FamiliarAssistantConfig, ResolvedFamiliarAssistantConfig } from './types'
 
 export const DEFAULT_TITLE = 'Ask Clip'
 export const DEFAULT_GREETING = 'What would you like to know?'
 export const DEFAULT_HISTORY_LIMIT = 10
 
 const DEFAULTS: Omit<
-  ResolvedClipAssistantConfig,
+  ResolvedFamiliarAssistantConfig,
   'transport' | 'container' | 'endpoint' | 'headers' | 'mascotAssets'
 > = {
   position: 'bottom-right',
@@ -21,9 +21,9 @@ const DEFAULTS: Omit<
 }
 
 /** Applies defaults to a user-supplied config, leaving pass-through fields untouched. */
-export function resolveConfig(config: ClipAssistantConfig): ResolvedClipAssistantConfig {
+export function resolveConfig(config: FamiliarAssistantConfig): ResolvedFamiliarAssistantConfig {
   if (!config.endpoint && !config.transport) {
-    throw new Error('clip-js: config must supply either `endpoint` or a custom `transport`.')
+    throw new Error('familiar-js: config must supply either `endpoint` or a custom `transport`.')
   }
 
   return {

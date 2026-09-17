@@ -1,25 +1,25 @@
-import './styles/clip.css'
+import './styles/familiar.css'
 
-export { ClipAssistant } from './core/ClipAssistant'
+export { FamiliarAssistant } from './core/FamiliarAssistant'
 export { resolveConfig } from './core/config'
 export {
   AssistantTransportError,
   type AssistantRequest,
   type AssistantResponse,
-  type ClipAssistantConfig,
-  type ClipMascotAssets,
-  type ClipMascotPreset,
-  type ClipPosition,
-  type ClipSource,
-  type ClipTheme,
+  type FamiliarAssistantConfig,
+  type FamiliarMascotAssets,
+  type FamiliarMascotPreset,
+  type FamiliarPosition,
+  type FamiliarSource,
+  type FamiliarTheme,
   type ConversationMessage,
-  type ResolvedClipAssistantConfig,
+  type ResolvedFamiliarAssistantConfig,
 } from './core/types'
 
 export { HttpTransport, type HttpTransportOptions } from './transport/HttpTransport'
 export type { Transport } from './transport/types'
 
-export { ClipMascot, type ClipMascotOptions } from './mascot/ClipMascot'
-export type { ClipMascotState } from './mascot/states'
+export { FamiliarMascot, type FamiliarMascotOptions } from './mascot/FamiliarMascot'
+export type { FamiliarMascotState } from './mascot/states'
 
-export { ClipAssistantElement, registerClipAssistantElement } from './web-component'
+export { FamiliarAssistantElement, registerFamiliarAssistantElement } from './web-component'

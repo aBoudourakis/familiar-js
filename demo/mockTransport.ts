@@ -2,7 +2,7 @@ import { AssistantTransportError, type AssistantRequest, type AssistantResponse,
 
 /**
  * Stand-in backend for local development. Demonstrates the shape a real
- * Transport implements — clip-js itself has no knowledge of what happens
+ * Transport implements — familiar-js itself has no knowledge of what happens
  * inside `send()`, whether that's a RAG pipeline, a plain LLM call, or
  * (as here) canned demo data.
  */
@@ -31,10 +31,10 @@ export class MockTransport implements Transport {
       }
     }
 
-    if (question.includes('clip-js') || question.includes('project')) {
+    if (question.includes('familiar-js') || question.includes('project')) {
       return {
         answer:
-          'clip-js is a reusable, embeddable AI assistant widget. It renders the UI and mascot, and delegates all AI/RAG logic to a backend transport you configure.',
+          'familiar-js is a reusable, embeddable AI assistant widget. It renders the UI and mascot, and delegates all AI/RAG logic to a backend transport you configure.',
         sources: [{ title: 'Overview', url: '#overview' }],
       }
     }

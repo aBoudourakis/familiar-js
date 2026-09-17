@@ -1,17 +1,17 @@
-import type { ClipSource } from '../../core/types'
+import type { FamiliarSource } from '../../core/types'
 import { externalLinkIcon } from '../icons'
 
 /** Renders citations/sources attached to an assistant message. */
-export function renderSourceList(sources: ClipSource[]): HTMLElement {
+export function renderSourceList(sources: FamiliarSource[]): HTMLElement {
   const wrapper = document.createElement('div')
-  wrapper.className = 'clip-sources'
+  wrapper.className = 'familiar-sources'
 
   const label = document.createElement('p')
-  label.className = 'clip-sources__label'
+  label.className = 'familiar-sources__label'
   label.textContent = 'Sources'
 
   const list = document.createElement('ul')
-  list.className = 'clip-sources__list'
+  list.className = 'familiar-sources__list'
 
   for (const source of sources) {
     const item = document.createElement('li')
@@ -19,7 +19,7 @@ export function renderSourceList(sources: ClipSource[]): HTMLElement {
     if (source.url) {
       const isExternal = /^https?:\/\//.test(source.url)
       const link = document.createElement('a')
-      link.className = 'clip-sources__link'
+      link.className = 'familiar-sources__link'
       link.href = source.url
       link.textContent = source.title
       if (isExternal) {
@@ -29,7 +29,7 @@ export function renderSourceList(sources: ClipSource[]): HTMLElement {
       }
       item.appendChild(link)
     } else {
-      item.className = 'clip-sources__text'
+      item.className = 'familiar-sources__text'
       item.textContent = source.title
     }
 

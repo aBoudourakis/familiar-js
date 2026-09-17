@@ -1,6 +1,12 @@
-export type ClipMascotState = 'idle' | 'hover' | 'thinking' | 'open'
+export type FamiliarMascotState = 'idle' | 'hover' | 'thinking' | 'open' | 'error'
 
-export const CLIP_MASCOT_STATES: readonly ClipMascotState[] = ['idle', 'hover', 'thinking', 'open']
+export const FAMILIAR_MASCOT_STATES: readonly FamiliarMascotState[] = [
+  'idle',
+  'hover',
+  'thinking',
+  'open',
+  'error',
+]
 
 /**
  * Idle-only blink cycle: eyes open for a long, restful stretch, then blink

@@ -2,18 +2,18 @@ import { Launcher } from '../components/launcher/Launcher'
 import { MessageList } from '../components/messages/MessageList'
 import { Panel } from '../components/panel/Panel'
 import { Suggestions, type SuggestionItem } from '../components/suggestions/Suggestions'
-import { ClipMascot } from '../mascot/ClipMascot'
+import { FamiliarMascot } from '../mascot/FamiliarMascot'
 import { HttpTransport } from '../transport/HttpTransport'
 import type { Transport } from '../transport/types'
 import { resolveConfig } from './config'
 import {
   AssistantTransportError,
-  type ClipAssistantConfig,
-  type ClipMascotPreset,
-  type ClipSource,
-  type ClipTheme,
+  type FamiliarAssistantConfig,
+  type FamiliarMascotPreset,
+  type FamiliarSource,
+  type FamiliarTheme,
   type ConversationMessage,
-  type ResolvedClipAssistantConfig,
+  type ResolvedFamiliarAssistantConfig,
 } from './types'
 
 const CHANGE_MASCOT_LABEL = 'Change mascot'
@@ -24,30 +24,30 @@ const CHANGE_MASCOT_LABEL = 'Change mascot'
  * the built-in HttpTransport (via `endpoint`) or a consumer-supplied
  * `transport` implementation.
  */
-export class ClipAssistant {
-  private readonly config: ResolvedClipAssistantConfig
+export class FamiliarAssistant {
+  private readonly config: ResolvedFamiliarAssistantConfig
   private readonly transport: Transport
   private readonly root: HTMLElement
-  private readonly launcherMascot: ClipMascot
-  private readonly headerMascot: ClipMascot
+  private readonly launcherMascot: FamiliarMascot
+  private readonly headerMascot: FamiliarMascot
   private readonly launcher: Launcher
   private readonly panel: Panel
   private readonly messageList: MessageList
   private readonly suggestions: Suggestions
 
   private conversation: ConversationMessage[] = []
-  private currentMascot: ClipMascotPreset
+  private currentMascot: FamiliarMascotPreset
   private open = false
   private pendingRequest: AbortController | null = null
 
-  constructor(config: ClipAssistantConfig) {
+  constructor(config: FamiliarAssistantConfig) {
     this.config = resolveConfig(config)
     this.currentMascot = this.config.mascot
     this.transport =
       this.config.transport ??
       new HttpTransport({ endpoint: this.config.endpoint as string, headers: this.config.headers })
 
-    this.launcherMascot = new ClipMascot({
+    this.launcherMascot = new FamiliarMascot({
       preset: this.config.mascot,
       assets: this.config.mascotAssets,
       size: 70,
@@ -61,7 +61,7 @@ export class ClipAssistant {
       onToggle: () => this.toggle(),
     })
 
-    this.headerMascot = new ClipMascot({
+    this.headerMascot = new FamiliarMascot({
       preset: this.config.mascot,
       assets: this.config.mascotAssets,
       size: 44,
@@ -96,14 +96,14 @@ export class ClipAssistant {
     this.panel.setHasConversation(false)
 
     const launcherLayer = document.createElement('div')
-    launcherLayer.className = 'clip-assistant__launcher-layer'
+    launcherLayer.className = 'familiar-assistant__launcher-layer'
     launcherLayer.appendChild(this.launcher.element)
 
     this.root = document.createElement('div')
-    this.root.className = 'clip-assistant'
-    this.root.setAttribute('data-clip-position', this.config.position)
-    this.root.setAttribute('data-clip-theme', this.config.theme)
-    this.root.setAttribute('data-clip-open', 'false')
+    this.root.className = 'familiar-assistant'
+    this.root.setAttribute('data-familiar-position', this.config.position)
+    this.root.setAttribute('data-familiar-theme', this.config.theme)
+    this.root.setAttribute('data-familiar-open', 'false')
     this.root.append(launcherLayer, this.panel.element)
 
     const container = this.config.container ?? document.body
@@ -118,7 +118,7 @@ export class ClipAssistant {
   openPanel(): void {
     if (this.open) return
     this.open = true
-    this.root.setAttribute('data-clip-open', 'true')
+    this.root.setAttribute('data-familiar-open', 'true')
     this.panel.open()
     this.launcher.setExpanded(true)
     this.panel.focusOnOpen()
@@ -128,7 +128,7 @@ export class ClipAssistant {
   close(): void {
     if (!this.open) return
     this.open = false
-    this.root.setAttribute('data-clip-open', 'false')
+    this.root.setAttribute('data-familiar-open', 'false')
     this.panel.close()
     this.launcher.setExpanded(false)
     this.launcher.focus()
@@ -157,12 +157,12 @@ export class ClipAssistant {
     this.headerMascot.setState('open')
   }
 
-  setTheme(theme: ClipTheme): void {
-    this.root.setAttribute('data-clip-theme', theme)
+  setTheme(theme: FamiliarTheme): void {
+    this.root.setAttribute('data-familiar-theme', theme)
   }
 
   /** Switches the launcher and panel mascot to a different built-in preset, live. */
-  setMascot(preset: ClipMascotPreset): void {
+  setMascot(preset: FamiliarMascotPreset): void {
     if (this.currentMascot === preset) return
     this.currentMascot = preset
     this.launcherMascot.setPreset(preset)
@@ -171,7 +171,7 @@ export class ClipAssistant {
     this.launcher.setShowRing(preset === 'Clip')
   }
 
-  getMascot(): ClipMascotPreset {
+  getMascot(): FamiliarMascotPreset {
     return this.currentMascot
   }
 
@@ -221,16 +221,17 @@ export class ClipAssistant {
       const assistantMessage: ConversationMessage = { role: 'assistant', content: response.answer }
       this.conversation.push(assistantMessage)
       this.messageList.setThinking(false)
-      this.messageList.addMessage(assistantMessage, response.sources as ClipSource[] | undefined)
+      this.messageList.addMessage(assistantMessage, response.sources as FamiliarSource[] | undefined)
       this.panel.announce(response.answer)
+      this.headerMascot.setState('open')
     } catch (error) {
       if (controller.signal.aborted) return
       this.messageList.setThinking(false)
       this.handleError(error)
+      this.headerMascot.setState('error')
     } finally {
       if (!controller.signal.aborted) {
         this.panel.setBusy(false)
-        this.headerMascot.setState('open')
         this.pendingRequest = null
       }
     }

@@ -1,13 +1,13 @@
 import type { Transport } from '../transport/types'
 
 /** Where the assistant launcher/panel is anchored on screen. */
-export type ClipPosition = 'bottom-right' | 'bottom-left'
+export type FamiliarPosition = 'bottom-right' | 'bottom-left'
 
 /** Theming mode. `auto` follows `prefers-color-scheme`. */
-export type ClipTheme = 'light' | 'dark' | 'auto'
+export type FamiliarTheme = 'light' | 'dark' | 'auto'
 
 /** Built-in mascot artwork to use. See `src/mascot/presets.ts` for the asset sets. */
-export type ClipMascotPreset = 'Clip' | 'Lens' | 'Seer' | 'Wizard'
+export type FamiliarMascotPreset = 'Clip' | 'Lens' | 'Seer' | 'Wizard'
 
 /** A single turn in the conversation, sent to and rendered from the backend. */
 export interface ConversationMessage {
@@ -16,7 +16,7 @@ export interface ConversationMessage {
 }
 
 /** A citation/source returned alongside an assistant answer. */
-export interface ClipSource {
+export interface FamiliarSource {
   title: string
   url?: string
 }
@@ -30,7 +30,7 @@ export interface AssistantRequest {
 /** Normalized response expected back from the configured transport. */
 export interface AssistantResponse {
   answer: string
-  sources?: ClipSource[]
+  sources?: FamiliarSource[]
 }
 
 /**
@@ -48,16 +48,17 @@ export class AssistantTransportError extends Error {
 }
 
 /** Replaceable mascot artwork, keyed by visual state. Falls back to the built-in Clip art. */
-export interface ClipMascotAssets {
+export interface FamiliarMascotAssets {
   idle?: string
   hover?: string
   thinking?: string
   open?: string
+  error?: string
   eyesClosing?: string
   eyesClosed?: string
 }
 
-export interface ClipAssistantConfig {
+export interface FamiliarAssistantConfig {
   /**
    * Endpoint the default HttpTransport will POST normalized requests to.
    * Ignored if a custom `transport` is supplied.
@@ -68,7 +69,7 @@ export interface ClipAssistantConfig {
   /** Mount point. Defaults to appending to `document.body`. */
   container?: HTMLElement
   /** Anchor corner for the launcher and panel. */
-  position?: ClipPosition
+  position?: FamiliarPosition
   /** Panel header title. */
   title?: string
   /** Small secondary line under the title, e.g. "Clip · Assistant". */
@@ -80,11 +81,11 @@ export interface ClipAssistantConfig {
   /** Starter prompts rendered as clickable suggestion chips. */
   suggestions?: string[]
   /** Theming mode. */
-  theme?: ClipTheme
+  theme?: FamiliarTheme
   /** Built-in mascot artwork to use. Defaults to `'Clip'`. */
-  mascot?: ClipMascotPreset
+  mascot?: FamiliarMascotPreset
   /** Per-state artwork overrides, merged on top of `mascot`. Use this to fully replace the mascot with your own art. */
-  mascotAssets?: ClipMascotAssets
+  mascotAssets?: FamiliarMascotAssets
   /**
    * Include a built-in "Change mascot" suggestion that previews the other
    * built-in mascots (as their idle artwork) and switches live on pick.
@@ -102,10 +103,10 @@ export interface ClipAssistantConfig {
 }
 
 /** Config after defaults have been applied; every optional field is resolved. */
-export interface ResolvedClipAssistantConfig
+export interface ResolvedFamiliarAssistantConfig
   extends Required<
     Omit<
-      ClipAssistantConfig,
+      FamiliarAssistantConfig,
       'transport' | 'container' | 'endpoint' | 'headers' | 'mascotAssets' | 'subtitle' | 'disclosure'
     >
   > {
@@ -113,7 +114,7 @@ export interface ResolvedClipAssistantConfig
   container?: HTMLElement
   endpoint?: string
   headers: Record<string, string>
-  mascotAssets: ClipMascotAssets
+  mascotAssets: FamiliarMascotAssets
   subtitle?: string
   disclosure?: string
 }

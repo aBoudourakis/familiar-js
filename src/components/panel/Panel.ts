@@ -1,4 +1,4 @@
-import { ClipMascot } from '../../mascot/ClipMascot'
+import { FamiliarMascot } from '../../mascot/FamiliarMascot'
 import { closeIcon, sendIcon } from '../icons'
 import { MessageList } from '../messages/MessageList'
 import { Suggestions } from '../suggestions/Suggestions'
@@ -9,7 +9,7 @@ export interface PanelOptions {
   greeting?: string
   disclosure?: string
   hasSuggestions: boolean
-  mascot: ClipMascot
+  mascot: FamiliarMascot
   messageList: MessageList
   suggestions: Suggestions
   onClose: () => void
@@ -49,36 +49,36 @@ export class Panel {
     this.messageList = options.messageList
 
     this.element = document.createElement('div')
-    this.element.className = 'clip-panel'
+    this.element.className = 'familiar-panel'
     this.element.setAttribute('role', 'dialog')
     this.element.hidden = true
 
-    const titleId = 'clip-panel-title-' + Math.random().toString(36).slice(2, 9)
+    const titleId = 'familiar-panel-title-' + Math.random().toString(36).slice(2, 9)
     this.element.setAttribute('aria-labelledby', titleId)
 
     // Header
     const header = document.createElement('div')
-    header.className = 'clip-panel__header'
+    header.className = 'familiar-panel__header'
 
     const headerText = document.createElement('div')
-    headerText.className = 'clip-panel__header-text'
+    headerText.className = 'familiar-panel__header-text'
 
     const titleEl = document.createElement('h2')
-    titleEl.className = 'clip-panel__title'
+    titleEl.className = 'familiar-panel__title'
     titleEl.id = titleId
     titleEl.textContent = options.title
     headerText.appendChild(titleEl)
 
     if (options.subtitle) {
       const subtitleEl = document.createElement('p')
-      subtitleEl.className = 'clip-panel__subtitle'
+      subtitleEl.className = 'familiar-panel__subtitle'
       subtitleEl.textContent = options.subtitle
       headerText.appendChild(subtitleEl)
     }
 
     this.closeButton = document.createElement('button')
     this.closeButton.type = 'button'
-    this.closeButton.className = 'clip-panel__close'
+    this.closeButton.className = 'familiar-panel__close'
     this.closeButton.setAttribute('aria-label', 'Close assistant')
     this.closeButton.appendChild(closeIcon())
     this.closeButton.addEventListener('click', () => this.onClose())
@@ -87,34 +87,34 @@ export class Panel {
 
     // Intro
     this.introEl = document.createElement('p')
-    this.introEl.className = 'clip-panel__intro'
+    this.introEl.className = 'familiar-panel__intro'
     this.introEl.textContent = options.greeting ?? ''
     this.introEl.hidden = !options.greeting
 
     const divider = document.createElement('div')
-    divider.className = 'clip-panel__divider'
+    divider.className = 'familiar-panel__divider'
 
     // Body
     const body = document.createElement('div')
-    body.className = 'clip-panel__body'
+    body.className = 'familiar-panel__body'
     body.append(options.suggestions.element, options.messageList.element)
 
     // Live region (screen-reader status announcements, kept separate from the visual log)
     this.liveRegion = document.createElement('div')
-    this.liveRegion.className = 'clip-visually-hidden'
+    this.liveRegion.className = 'familiar-visually-hidden'
     this.liveRegion.setAttribute('aria-live', 'polite')
     this.liveRegion.setAttribute('aria-atomic', 'true')
 
     // Composer
     const inputRow = document.createElement('form')
-    inputRow.className = 'clip-panel__input-row'
+    inputRow.className = 'familiar-panel__input-row'
     inputRow.addEventListener('submit', (event) => {
       event.preventDefault()
       this.submit(options.onSubmit)
     })
 
     this.textarea = document.createElement('textarea')
-    this.textarea.className = 'clip-panel__input'
+    this.textarea.className = 'familiar-panel__input'
     this.textarea.placeholder = 'Ask a question…'
     this.textarea.rows = 1
     this.textarea.setAttribute('aria-label', 'Ask a question')
@@ -127,7 +127,7 @@ export class Panel {
 
     this.sendButton = document.createElement('button')
     this.sendButton.type = 'submit'
-    this.sendButton.className = 'clip-panel__send'
+    this.sendButton.className = 'familiar-panel__send'
     this.sendButton.setAttribute('aria-label', 'Send question')
     this.sendButton.appendChild(sendIcon())
 
@@ -135,16 +135,16 @@ export class Panel {
 
     // Footer
     const footer = document.createElement('div')
-    footer.className = 'clip-panel__footer'
+    footer.className = 'familiar-panel__footer'
 
     const disclosure = document.createElement('p')
-    disclosure.className = 'clip-panel__disclosure'
+    disclosure.className = 'familiar-panel__disclosure'
     disclosure.textContent = options.disclosure ?? ''
     disclosure.hidden = !options.disclosure
 
     this.clearButton = document.createElement('button')
     this.clearButton.type = 'button'
-    this.clearButton.className = 'clip-panel__clear'
+    this.clearButton.className = 'familiar-panel__clear'
     this.clearButton.textContent = 'Clear conversation'
     this.clearButton.hidden = true
     this.clearButton.addEventListener('click', () => options.onReset())
