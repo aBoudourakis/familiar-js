@@ -13,7 +13,7 @@ A lightweight, reusable AI assistant widget with configurable mascot personas, a
 
 `familiar-js` renders a floating launcher and conversational panel — with suggested questions, light/dark/auto theming, a mobile-responsive layout, and keyboard/screen-reader support — while staying completely decoupled from any AI provider. It separates mascot visuals, interaction state, and UI behavior from the actual backend call, so you can plug in a RAG endpoint, an LLM API, or any custom transport.
 
-> **Status:** Early development. Not yet published to npm — install from source (see [Installation](#installation)).
+> **Status:** Early development. Published to npm as [`familiar-js`](https://www.npmjs.com/package/familiar-js) — APIs may still change between releases.
 
 ## Features
 
@@ -32,7 +32,7 @@ A lightweight, reusable AI assistant widget with configurable mascot personas, a
 npm install familiar-js
 ```
 
-The package is not yet published; until then, install directly from a git checkout or a local `npm pack` tarball.
+Or, to work against the latest unreleased changes, install directly from a git checkout or a local `npm pack` tarball.
 
 ## Quick Start
 
